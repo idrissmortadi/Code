@@ -59,20 +59,20 @@ def algorithm_script(params: Dict[str, str]):
         
 
     if (params['dataset'] == 'ldbc'):
-        DBname = "ldbc" 
+        DBname = "DBP-15k" 
         uri = "bolt://localhost:7687" 
         user = "neo4j"
-        passwd = "1234"
+        passwd = "password"
     elif (params['dataset'] == 'covid-19'):
         DBname = "covid19"
         uri = "bolt://db.covidgraph.org:7687"
         user = "public"
-        passwd = "corona"
+        passwd = "password"
     elif (params['dataset'] == 'fib25'):
         DBname = "fib25" 
         uri = "bolt://localhost:7687" 
         user = "neo4j"
-        passwd = "1234"
+        passwd = "password"
     else:
         exit(1)
     # Connection a la base de donnée Neo4j

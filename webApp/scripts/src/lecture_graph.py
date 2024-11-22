@@ -11,33 +11,38 @@ from time import time
 
 def lecture_graph(driver, edge):
     with driver.session() as session:
-
-        # We do one query to get all differents set of labels
-        print(colored("Querying neo4j to get a part of the graph:", "yellow"))
+        # Query to get nodes with IDs, labels, and properties
+        print(colored("Querying Neo4j to get a part of the graph:", "yellow"))
         nodes = session.run(
-            "MATCH(n) \
-            RETURN DISTINCT labels(n), keys(n), COUNT(n)"
+            "MATCH (n) \
+             RETURN id(n) AS id, labels(n) AS labels, keys(n) AS keys, COUNT(n) AS count"
         )
 
         graph = Graph()
         for node in nodes:
-            labels = set(node["labels(n)"])
-            properties = set(node["keys(n)"])
-            count = node["COUNT(n)"]
-            n = Node(labels, properties)
+            node_id = str(node["id"])  # Fetch original ID as a string
+            labels = set(node["labels"])
+            properties = set(node["keys"])
+            count = node["count"]
+            n = Node(node_id, labels, properties)
 
             graph.add_node(n, count)
 
-        print(colored("Done.", "green"))
+        print(colored("Done fetching nodes.", "green"))
         printb(graph)
 
         edges = None
         if edge:
-            print(colored("Querying neo4j to get all the edges:", "yellow"))
-            query = "MATCH (n)-[r]->(m) \
-                    RETURN DISTINCT labels(n),keys(n),type(r),labels(m),keys(m)"
+            print(colored("Querying Neo4j to get all the edges:", "yellow"))
+            query = """
+                MATCH (n)-[r]->(m)
+                RETURN id(n) AS source_id, id(m) AS target_id, type(r) AS relationship_type
+            """
             edges_a = session.run(query)
-            edges = [e for e in edges_a]
-            print(colored("Done.", "green"))
-    
+            edges = [
+                {"source_id": str(e["source_id"]), "target_id": str(e["target_id"]), "type": e["relationship_type"]}
+                for e in edges_a
+            ]
+            print(colored("Done fetching edges.", "green"))
+
         return graph, edges

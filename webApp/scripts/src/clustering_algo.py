@@ -129,39 +129,41 @@ def rec_clustering(cluster, nb_cluster=2):
         #print("\n")
 
 def max_labs_props(correct_node, n=1):
-    # create a fictive node, which should be in the middle of the data set
+    # Create a fictive node that should be in the middle of the dataset
 
-    # get the most frequent label
+    # Get the most frequent label
     freq_lab = dict()
     for node in correct_node:
         for l in node.get_labels():
-            if (l not in freq_lab):
+            if l not in freq_lab:
                 freq_lab[l] = correct_node[node]
             else:
                 freq_lab[l] += correct_node[node]
     dominant_label = set(max(freq_lab, key=freq_lab.get))
 
-    # get the n most frequent propretries
+    # Get the n most frequent properties
     freq_prop = dict()
     for node in correct_node:
-        for l in node.get_proprety():
-            if (l not in freq_prop):
-                freq_prop[l] = correct_node[node]
+        for prop in node.get_properties():
+            if prop not in freq_prop:
+                freq_prop[prop] = correct_node[node]
             else:
-                freq_prop[l] += correct_node[node]
+                freq_prop[prop] += correct_node[node]
 
     dominant_prop = set()
     for i in range(n):
         try:
-            # get the argmax of the most frequent property
+            # Get the argmax of the most frequent property
             temp_prop = max(freq_prop, key=freq_prop.get)
             dominant_prop.add(temp_prop)
             freq_prop.pop(temp_prop)
-        except:
+        except ValueError:
+            # No properties left to process
             pass
 
-    return Node(dominant_label, dominant_prop)
-
+    # Ensure that the Node initialization matches the required structure
+    # Assuming `Node` requires `id`, `labels`, and `properties` arguments
+    return Node(id="temp_id", labels=dominant_label, properties=dominant_prop)
 
 def compute_similarities(nodes, ref_node):
     similarities_dict = dict()

@@ -1,11 +1,12 @@
 from typing import List, Set
 
 class Node:
-    def __init__(self, labels, propriete, edge_out = [], edge_in = []) -> None:
+    def __init__(self, id: str, labels: Set[str], properties: Set[str], edges_out=None, edges_in=None) -> None:
+        self.id = id  # Store the original ID
         self._labels = labels
-        self._proprety = propriete
-        self._out = edge_out
-        self._in = edge_in
+        self._proprety = properties
+        self._out = edges_out
+        self._in = edges_in
 
     def get_labels(self) -> Set[str]:
         return self._labels
@@ -16,38 +17,29 @@ class Node:
     def get_proprety(self) -> Set[str]:
         return self._proprety
 
+    def get_id(self) -> str:
+        return self.id
+
     def __str__(self) -> str:
-        labs = sorted(list(self._labels))
-        n = sorted(list(self._labels))
-        mot = "Labels : "
-        for l in labs:
-            mot += l + ", "
-        mot += "  |   Property : "
-        for p in n:
-            mot += p + ", "
-        return mot
-    
+        return f"ID: {self.id} | Labels: {', '.join(sorted(self._labels))} | Properties: {', '.join(sorted(self._proprety))}"
+
     def __repr__(self) -> str:
-        mot = "Labels : "
-        for l in self._labels:
-            mot += l + ", "
-        mot += "  |   Property : "
-        for p in self._proprety:
-            mot += p + ", "
-        mot += "\n"
-        return mot
+        return self.__str__()
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Node):
+            return False
+        return (
+            self.id == other.id and
+            self._labels == other._labels and 
+            self._proprety == other._proprety and
+            self._out == other._out and
+            self._in == other._in
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.id, frozenset(self._labels), frozenset(self._proprety)))
     
-    def __eq__(self, other):
-
-        return self._labels == other._labels and self._proprety == other._proprety and self._out == other._out and self._in == other._in
-    
-    def __hash__(self):
-
-        tuple_retour = (frozenset(self._labels), frozenset(self._proprety))
-        return hash(tuple_retour) 
-
-#------------------------------------------------------------------------------
-
 class Graph:
     def __init__(self, nodes = None) -> None:
         self._nodes = set()
@@ -94,8 +86,11 @@ class Graph:
 
 #------------------------------------------------------------------------------
 
+import uuid
+
 class Cluster:
-    def __init__(self, name = "") -> None:
+    def __init__(self, name="") -> None:
+        self._id = str(uuid.uuid4())  # Generate a unique ID
         self._name = name
         self._ref_node = None
         self._cutting_values = []
@@ -103,6 +98,9 @@ class Cluster:
         self._fils = []
         self._modification = 0
         self._sons_id = None
+
+    def get_original_id(self):
+        return self._id
     
     def get_nodes(self):
         return self._nodes
