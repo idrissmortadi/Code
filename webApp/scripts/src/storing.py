@@ -90,8 +90,8 @@ def storing(cluster, edges, name):
             tab = [[0 for _ in range(N)] for _ in range(N)]
 
             for edge in edges:
-                ln = set(edge["labels(n)"])
-                pn = set(edge["keys(n)"])
+                ln = set(edge.get("labels(n)", []))  # Gracefully handle missing 'labels(n)'
+                pn = set(edge.get("keys(n)", []))    # Handle missing 'keys(n)'
                 node_id = edge.get("source_id", "unknown")
                 n = Node(id=node_id, labels=ln, properties=pn)  # Fixed instantiation
 
@@ -101,18 +101,18 @@ def storing(cluster, edges, name):
                     if cluster_list[i].get_son() == [] and n in cluster_list[i]._nodes:
                         cn = i
 
-                lm = set(edge["labels(m)"])
-                pm = set(edge["keys(m)"])
+                lm = set(edge.get("labels(m)", []))  # Handle missing 'labels(m)'
+                pm = set(edge.get("keys(m)", []))    # Handle missing 'keys(m)'
                 target_id = edge.get("target_id", "unknown")
                 m = Node(id=target_id, labels=lm, properties=pm)  # Fixed instantiation
 
                 cm = 0
-                original_target_id = edge["target_id"]
+                original_target_id = edge.get("target_id", "N/A")
                 for i in range(1, N):
                     if cluster_list[i].get_son() == [] and m in cluster_list[i]._nodes:
                         cm = i
 
-                t = edge["type(r)"]
+                t = edge.get("type(r)", "UNKNOWN")
                 tab[cn][cm] = t
 
                 writer.writerow([cn, cm, original_source_id, original_target_id, t, "0"])
