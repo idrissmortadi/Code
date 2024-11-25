@@ -71,7 +71,8 @@ def storing(cluster, edges, name):
             for edge in edges:
                 ln = set(edge["labels(n)"])
                 pn = set(edge["keys(n)"])
-                n = Node(ln,pn)
+                node_id = edge.get("source_id", "unknown")
+                n = Node(id=node_id, labels=ln, properties=pn) 
                 cn = 0
                 for i in range(1,N):
                     if cluster_list[i].get_son() == [] and n in cluster_list[i]._nodes:
@@ -79,7 +80,8 @@ def storing(cluster, edges, name):
 
                 lm = set(edge["labels(m)"])
                 pm = set(edge["keys(m)"])
-                m = Node(lm,pm)
+                target_id = edge.get("target_id", "unknown")
+                m = Node(id=target_id, labels=lm, properties=pm)  #
                 cm = 0
                 for i in range(1,N):
                     if cluster_list[i].get_son() == [] and m in cluster_list[i]._nodes:

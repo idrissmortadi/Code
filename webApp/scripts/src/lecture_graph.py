@@ -16,15 +16,16 @@ def lecture_graph(driver, edge):
         print(colored("Querying neo4j to get a part of the graph:", "yellow"))
         nodes = session.run(
             "MATCH(n) \
-            RETURN DISTINCT labels(n), keys(n), COUNT(n)"
+            RETURN DISTINCT id(n) AS id, labels(n), keys(n), COUNT(n)"
         )
 
         graph = Graph()
         for node in nodes:
+            node_id = str(node["id"])
             labels = set(node["labels(n)"])
             properties = set(node["keys(n)"])
             count = node["COUNT(n)"]
-            n = Node(labels, properties)
+            n = Node(node_id, labels, properties)
 
             graph.add_node(n, count)
 
@@ -35,7 +36,7 @@ def lecture_graph(driver, edge):
         if edge:
             print(colored("Querying neo4j to get all the edges:", "yellow"))
             query = "MATCH (n)-[r]->(m) \
-                    RETURN DISTINCT labels(n),keys(n),type(r),labels(m),keys(m)"
+                    RETURN DISTINCT id(n) AS source_id,labels(n),keys(n),type(r),labels(m),keys(m), id(m) AS target_id"
             edges_a = session.run(query)
             edges = [e for e in edges_a]
             print(colored("Done.", "green"))

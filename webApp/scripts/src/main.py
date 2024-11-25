@@ -1,6 +1,7 @@
 """ Main script to infer a PG schema of any database using a clustering method """
 
 # Imports
+from .storing_org import EdgesOriginCSVWriter
 from typing import Dict
 from termcolor import colored
 import csv
@@ -59,20 +60,20 @@ def algorithm_script(params: Dict[str, str]):
         
 
     if (params['dataset'] == 'ldbc'):
-        DBname = "ldbc" 
+        DBname = "DBP-15k" 
         uri = "bolt://localhost:7687" 
         user = "neo4j"
-        passwd = "1234"
+        passwd = "password"
     elif (params['dataset'] == 'covid-19'):
         DBname = "covid19"
         uri = "bolt://db.covidgraph.org:7687"
         user = "public"
-        passwd = "corona"
+        passwd = "password"
     elif (params['dataset'] == 'fib25'):
         DBname = "fib25" 
         uri = "bolt://localhost:7687" 
         user = "neo4j"
-        passwd = "1234"
+        passwd = "password"
     else:
         exit(1)
     # Connection a la base de donnée Neo4j
@@ -124,7 +125,7 @@ def algorithm_script(params: Dict[str, str]):
     t2 = time.perf_counter()
     cluster = clustering(trainning_graph, int(params["nb_subcluster"]))
     t2f = time.perf_counter()
-
+    print("Cluster nods:", cluster.get_nodes())
     step2 = t2f - t2  # time to complete step 2
     print(colored("Clustering done.", "green"))
     print("Step 2: Clustering was completed in ", step2, "s")
@@ -133,6 +134,11 @@ def algorithm_script(params: Dict[str, str]):
     print(colored("Writing file and identifying subtypes :", "red"))
     t3 = time.perf_counter()
     file = storing(cluster, edges, params['dataset'])
+
+    csv_writer = EdgesOriginCSVWriter([cluster])
+
+    # Write the edges
+    csv_writer.write_edges()
     if params["evaluate"]:
         eval_quality()
     t3f = time.perf_counter()

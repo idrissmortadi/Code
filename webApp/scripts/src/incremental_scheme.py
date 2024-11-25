@@ -255,7 +255,7 @@ def add_node_exact(dict_node, nb_cluster = 2):
 
     return cluster
  
-
+'''
 def add_node_exact_rec(cluster, pre_computed, nb_cluster = 2):
 
     bm = global_variable("bm")
@@ -309,9 +309,8 @@ def add_node_exact_rec(cluster, pre_computed, nb_cluster = 2):
                 cluster.add_son(pre_computed[id])
             elif len(id) > 0:
                 cluster.add_son(new_clusters[i])
-                add_node_exact_rec(new_clusters[i], pre_computed)
-                
-
+                add_node_exact_rec(new_clusters[i], pre_computed)                
+'''
                 
 
 
@@ -620,3 +619,75 @@ def rec_storing_incr(cluster, writer, i, parent_id, run_clusters, k, cluster_lis
 
     return i, k
 
+def add_relationship_with_id(cluster, parent_node, child_node, rel_type="SUBTYPE_OF"):
+    """
+    Add a relationship of the specified type between two nodes, while preserving their original IDs.
+    """
+    if not hasattr(parent_node, 'id') or not hasattr(child_node, 'id'):
+        raise ValueError("Both parent and child nodes must have an 'original_id' property.")
+
+    original_parent_id = parent_node.id
+    original_child_id = child_node.id
+
+    # Log or store the relationship in your cluster or data structure
+    cluster.add_relationship({
+        "type": rel_type,
+        "source": parent_node,
+        "target": child_node,
+        "metadata": {
+            "parent_original_id": original_parent_id,
+            "child_original_id": original_child_id
+        }
+    })
+    print(f"Added {rel_type} relationship: {original_parent_id} -> {original_child_id}")
+
+# Example usage in an existing function, like `add_node_exact_rec`
+def add_node_exact_rec(cluster, pre_computed, nb_cluster=2):
+    bm = global_variable("bm")
+    Benchmark.objects.filter(pk=bm.pk).update(n_iterations=bm.n_iterations + 1)
+    bm.refresh_from_db()
+
+    t = time()
+    b = deepcopy(global_variable("cluster"))
+    global_variable("history").append((t, b))
+
+    correct_nodes = cluster.get_nodes()
+    ref_node = max_labs_props(correct_nodes)
+
+    cluster._name = str(ref_node)
+    cluster._ref_node = ref_node
+    similarities_dict = compute_similarities(correct_nodes, ref_node)
+
+    computed_measures, ecrasage = to_format(similarities_dict, correct_nodes)
+
+    if len(correct_nodes) >= nb_cluster and nb_cluster > 0:
+        bgmm = BayesianGaussianMixture(n_components=nb_cluster, tol=1, max_iter=10).fit(computed_measures)
+        predictions = bgmm.predict(computed_measures)
+
+        j = 0
+        new_clusters = [Cluster("Oh") for _ in range(nb_cluster)]
+        cluster._cutting_values = cutting_value(computed_measures, predictions)
+        for node in correct_nodes:
+            amount = correct_nodes[node] // (10**ecrasage)
+            for i in range(amount):
+                if node in new_clusters[predictions[j]]._nodes:
+                    new_clusters[predictions[j]]._nodes[node] += 10**ecrasage
+                else:
+                    new_clusters[predictions[j]]._nodes[node] = 10**ecrasage
+
+                # Add a SUBTYPE_OF relationship using original IDs
+                add_relationship_with_id(cluster, ref_node, node, rel_type="SUBTYPE_OF")
+                j += 1
+
+        count = sum(len(c.get_nodes()) != 0 for c in new_clusters)
+        if count < 2:
+            return
+
+        cluster._fils = []
+        for i in range(nb_cluster):
+            cluster_id = frozenset(new_clusters[i].get_nodes().items())
+            if cluster_id in pre_computed:
+                cluster.add_son(pre_computed[cluster_id])
+            elif len(cluster_id) > 0:
+                cluster.add_son(new_clusters[i])
+                add_node_exact_rec(new_clusters[i], pre_computed)

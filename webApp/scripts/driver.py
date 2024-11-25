@@ -8,9 +8,9 @@ from random import randint
 def get_benchmark(algo, dataset):
     time = randint(20, 50)
     size = randint(500, 1000)
-    url = os.getenv("NEO4J_URI", "neo4j://localhost:7687")
+    url = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USER", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "1234")
+    password = os.getenv("NEO4J_PASSWORD", "password")
     neo4jVersion = os.getenv("NEO4J_VERSION", "4")
     database = os.getenv("NEO4J_DATABASE", "neo4j")
     port = os.getenv("PORT", 8080)
@@ -57,9 +57,9 @@ class QueryBuilder:
 
 
 if __name__ == "__main__":
-    url = os.getenv("NEO4J_URI", "neo4j://localhost:7687")
+    url = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USER", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "1234")
+    password = os.getenv("NEO4J_PASSWORD", "password")
     neo4jVersion = os.getenv("NEO4J_VERSION", "4")
     database = os.getenv("NEO4J_DATABASE", "neo4j")
     port = os.getenv("PORT", 8080)

@@ -160,7 +160,7 @@ def max_labs_props(correct_node, n=1):
         except:
             pass
 
-    return Node(dominant_label, dominant_prop)
+    return Node("temp_id",dominant_label, dominant_prop)
 
 
 def compute_similarities(nodes, ref_node):
