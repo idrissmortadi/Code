@@ -2,5 +2,17 @@ __pycache__/
 
 ./myenv
 ./my_env
+.venv/
 
 db.sqlite3
+*.swp
+expose_app.py
+jdk-21.0.5/
+jdk-23.0.1/
+jre1.8.0_431/
+neo4j-enterprise-3.5.30/
+neo4j-enterprise-4.4.38/
+neo4j-enterprise-5.24.2/
+preprocess_neo4j/
+setup_env.sh
+tar_files/
