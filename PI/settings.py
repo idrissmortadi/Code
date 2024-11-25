@@ -28,7 +28,7 @@ SECRET_KEY = '*lkoc-&zlm^)t^ib9uthrq%fl%l1j$_ai07wv=%icra#ip$1z%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
