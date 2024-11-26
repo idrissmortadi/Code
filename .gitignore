@@ -3,8 +3,6 @@ __pycache__/
 ./myenv
 ./my_env
 .venv/
-
-db.sqlite3
 *.swp
 expose_app.py
 jdk-21.0.5/
