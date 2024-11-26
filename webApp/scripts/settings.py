@@ -2,23 +2,17 @@
 # Thus, everytime we want a global variable for the whole programm, we will store it in d
 # The value of a variable will be the value in d with as a key the string of the name of the variable
 
-try:
-    d
-except:
+if "d" in globals():
+    pass
+else:
     d = dict()
 
-class Quisertarien():
-    def __init__(self):
-        pass
-a = Quisertarien()
 
-# The variable a is used so that we don't have to specify when we don't want add things.
-
-def global_variable(name, value = a, delete = False):
+def global_variable(name, value=None, delete=False):
     global d
     if delete:
         d.pop(name)
-    if value == a:
+    if value is None:
         return d[name]
     else:
         d[name] = value
